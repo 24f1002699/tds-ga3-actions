@@ -14,8 +14,32 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: 24f1002699@ds.study.iitm.ac.in
         run: |
+          npm install seedrandom
+          node -e "
+          const seedrandom = require('seedrandom');
+          function generate(seed, rows, cols) {
+            const random = seedrandom(seed);
+            return Array.from({ length: rows }, () =>
+              Array.from({ length: cols }, () => Math.round(random() * 1000))
+            );
+          }
+          const seeds = ['32','33','34','35','36','37','38','39','40','41'];
+          let total = 0;
+          for (const seed of seeds) {
+            const table = generate(seed, 50, 10);
+            const sum = table.flat().reduce((a, b) => a + b, 0);
+            console.log('Seed ' + seed + ': ' + sum);
+            total += sum;
+          }
+          console.log(total);
+          "
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           date > status.txt
